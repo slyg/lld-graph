@@ -1,16 +1,15 @@
-def shortened(n): 
-    n 
-    | split("_") [:3] 
+def shortened(n):
+    n
+    | split("_") [:3]
     | join("_")
 ;
 [
     .pacts[]._embedded
-    | select(.consumer.name) 
-    | 
-        {
-            key: [ shortened(.consumer.name), shortened(.provider.name) ] | join("@"),
-            consumer: shortened(.consumer.name),
-            provider: shortened(.provider.name)
-        }
+        | select(.consumer.name)
+        |
+            {
+                consumer: shortened(.consumer.name),
+                provider: shortened(.provider.name)
+            }
 ]
-| unique_by(.key)
+| unique_by([ .consumer, .provider ] | join("@"))
