@@ -1,0 +1,21 @@
+#!/bin/bash
+
+dist="dist"
+viz_type="dot"
+target="$dist/spread.dot"
+
+mkdir -p $dist
+
+echo -e "digraph {\nranksep=3; ratio=auto; overlap=false;\nnode [ shape = plaintext, fontname = \"Helvetica\" ];" > $target
+
+curl \
+    https://pact-broker.platform.hmcts.net/pacts/latest \
+    | jq '.pacts[]._embedded | select(.consumer.name) | .consumer.name + "->" + .provider.name' \
+    | tr -d '"' \
+    | sed 's/-/_/g' \
+    | sed 's/_>/->/g' \
+    >> $target
+
+echo "}" >> $target
+
+$viz_type $target -o $dist/spread-diagram.png -T png
