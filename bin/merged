@@ -1,22 +1,18 @@
 #!/bin/bash
+. .env
+source lib/create_dot_with.sh
+source lib/create_diagram.sh
 
-dist="dist"
-viz_type="dot"
-target="$dist/merged.dot"
+dot_file="dist/merged.dot"
+png_file="dist/merged-diagram.png"
 
-mkdir -p $dist
+mkdir -p dist
 
-echo -e "digraph {\nranksep=3; ratio=auto; overlap=false;\nnode [ shape = plaintext, fontname = \"Helvetica\" ];" > $target
-
-curl \
-    https://pact-broker.platform.hmcts.net/pacts/latest \
+relations=$(curl \
+    $BROKER_URL \
     | jq -f './queries/merged.jq' \
     | jq '.[] | .consumer + "->" + .provider' \
-    | tr -d '"' \
-    | sed 's/-/_/g' \
-    | sed 's/_>/->/g' \
-    >> $target
+    | tr -d '"')
 
-echo "}" >> $target
-
-$viz_type $target -o $dist/merged-diagram.png -T png
+create_dot_with $relations > $dot_file
+create_diagram $dot_file $png_file

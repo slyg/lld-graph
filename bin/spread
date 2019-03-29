@@ -1,21 +1,17 @@
 #!/bin/bash
+. .env
+source lib/create_dot_with.sh
+source lib/create_diagram.sh
 
-dist="dist"
-viz_type="dot"
-target="$dist/spread.dot"
+dot_file="dist/spread.dot"
+png_file="dist/spread-diagram.png"
 
-mkdir -p $dist
+mkdir -p dist
 
-echo -e "digraph {\nranksep=3; ratio=auto; overlap=false;\nnode [ shape = plaintext, fontname = \"Helvetica\" ];" > $target
+relations=$(curl \
+    $BROKER_URL \
+    | jq -f './queries/spread.jq' \
+    | tr -d '"')
 
-curl \
-    https://pact-broker.platform.hmcts.net/pacts/latest \
-    | jq '.pacts[]._embedded | select(.consumer.name) | .consumer.name + "->" + .provider.name' \
-    | tr -d '"' \
-    | sed 's/-/_/g' \
-    | sed 's/_>/->/g' \
-    >> $target
-
-echo "}" >> $target
-
-$viz_type $target -o $dist/spread-diagram.png -T png
+create_dot_with $relations > $dot_file
+create_diagram $dot_file $png_file
