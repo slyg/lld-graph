@@ -3,14 +3,16 @@
 source lib/create_dot_with.sh
 source lib/create_diagram.sh
 
-dot_file="dist/spread.dot"
-png_file="dist/spread-diagram.png"
+dot_file="dist/graph.dot"
+png_file="dist/diagram.png"
+level=${1:-infinity}
 
 mkdir -p dist
 
 relations=$(curl \
     $BROKER_URL \
-    | jq -f './queries/spread.jq' \
+    | jq --arg LEVEL $level -f './queries/components.jq' \
+    | jq '.[] | .consumer + "->" + .provider + "\n"' \
     | tr -d '"')
 
 create_dot_with $relations > $dot_file

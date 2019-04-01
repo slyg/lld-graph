@@ -1,19 +1,14 @@
-.DEFAULT_GOAL := view-merged
+.DEFAULT_GOAL := diagram-merged
 SHELL := /bin/bash
 PATH := bin:$(PATH)
 
-.PHONY: spread-diagram
-spread-diagram:
-	spread
+.PHONY: diagram-merged
+diagram-merged:
+	graph 3
+	@open dist/diagram.png
 
-.PHONY: merged-diagram
-merged-diagram:
-	merged
 
-.PHONY: view-spread
-view-spread: spread-diagram
-	@open dist/spread-diagram.png
-
-.PHONY: view-merged
-view-merged: merged-diagram
-	@open dist/merged-diagram.png
+.PHONY: diagram-spread
+diagram-spread:
+	graph
+	@open dist/diagram.png

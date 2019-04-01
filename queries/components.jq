@@ -1,11 +1,11 @@
 def shortened(n):
     n
-    | split("_") [:3]
+    | split("_") [:($LEVEL | tonumber)]
     | join("_")
 ;
 [
     .pacts[]._embedded
-        | select(.consumer.name)
+        | select(.consumer.name and .provider.name)
         |
             {
                 consumer: shortened(.consumer.name),
