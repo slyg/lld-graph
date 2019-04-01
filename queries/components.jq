@@ -13,3 +13,5 @@ def shortened(n):
             }
 ]
 | unique_by([ .consumer, .provider ] | join("@"))
+| .[]
+| .consumer + "->" + .provider
